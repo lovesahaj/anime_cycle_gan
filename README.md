@@ -6,5 +6,4 @@ Used a CycleGAN model to try to convert anime characters to "real life" and vice
 
 Then made a website using django to make the whole converting process, as flawless as it can be.
 
-![Screenshot from 2021-10-31 11-34-19](./Screenshot from 2021-10-31 11-34-19.png)
-
+![Screenshot from 2021-10-31 11-34-19](./website_ss.png)
