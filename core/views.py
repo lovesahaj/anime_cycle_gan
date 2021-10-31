@@ -1,8 +1,14 @@
 import pathlib
 import uuid
-from django.shortcuts import render
+from django.shortcuts import redirect, render
+from django.core.files.base import ContentFile
+
+from core.models import History
 from .form import ImageUpload
 import os
+from cyclegan.utils import get_predicted_image
+from PIL import Image
+import cv2
 
 
 def homepage(request):
@@ -30,6 +36,39 @@ def save_file(f, instance):
     return path
 
 
+def results(request):
+    this = request.session['object']
+    this = History.objects.get(pk=this)
+
+    img_path = this.input_img.path
+    category = request.session['category']
+
+    output_name = '/media/output.jpg'
+    model_dir = os.path.join(os.getcwd(), './cyclegan/trained_models')
+
+    output_img = get_predicted_image(
+        img_path,
+        output=category,
+        output_name=output_name,
+        model_dir=model_dir,
+        does_return=True,
+    )
+
+    ret, buf = cv2.imencode('.jpg', output_img)
+
+    output_img = ContentFile(buf.tobytes())
+    this.output_img.save('output.jpg', output_img)
+    this.save()
+
+    context = {
+        'object': this,
+    }
+
+    template = 'result.html'
+
+    return render(request, template_name=template, context=context)
+
+
 # Create your views here.
 def upload(request, category):
     if category == 'anime':
@@ -39,7 +78,16 @@ def upload(request, category):
 
     if form.is_valid():
         img = request.FILES['image']
-        img_path = save_file(img, category)
+        print(type(img))
+        this = History()
+        this.input_img.save('input.jpg', img)
+        this.save()
+        # img_path = save_file(img, category)
+
+        request.session['object'] = this.pk
+        request.session['category'] = category
+
+        return redirect('result')
 
     template = 'form.html'
     context = {

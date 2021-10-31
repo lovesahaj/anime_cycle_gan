@@ -73,7 +73,8 @@ def get_predicted_image(input_file,
                         output_name,
                         device='cpu',
                         output='anime',
-                        model_dir='../trained_models'):
+                        model_dir='../trained_models',
+                        does_return=False):
     img = cv2.imread(input_file)
     img = cv2.resize(img, (IMG_SIZE, IMG_SIZE))
 
@@ -94,6 +95,9 @@ def get_predicted_image(input_file,
 
         out = model(img).squeeze().permute(1, 2, 0)
         out = out.numpy() * 255
+
+        if does_return:
+            return out
 
         out = cv2.cvtColor(out, cv2.COLOR_RGB2BGR)
 

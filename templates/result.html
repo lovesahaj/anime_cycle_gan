@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block body %}
+<div>
+    <label for="original">Original Image</label>
+    <img name='original' src="{{ object.input_img.url }}" alt="" width="128" height="128">
+</div>
+<div>
+    <label for="predicted">Predicted Image</label>
+    <img name='predicted' src="{{ object.output_img.url }}" alt="" width="128" height="128">
+</div>
+
+<a href="{% url 'homepage' %}">Return to Home</a>
+{% endblock body %}
